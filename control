@@ -1,0 +1,9 @@
+Package: com.huican.altar
+Name: altar
+Depends: mobilesubstrate
+Version: 0.0.1
+Architecture: iphoneos-arm
+Description: An awesome MobileSubstrate tweak!
+Maintainer: zw
+Author: zw
+Section: Tweaks
