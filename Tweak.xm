@@ -23,11 +23,18 @@
     return uuid;
 }
 
--(NSString *)uniqueIdentifier
+-(NSString *)model
 {
     NSString *sModel = %orig;
-    NSLog(@"model=%@", sModel);
+    NSLog(@"nbTweakLog, model=%@", sModel);
     return sModel;
+}
+
+-(NSString *)uniqueIdentifier
+{
+    NSString *unidentifier =%orig;
+    NSLog(@"nbTweakLog: unidentifier=%@", unidentifier);
+    return unidentifier;
 }
 
 -(NSString *)serialNumberData {
@@ -63,5 +70,53 @@
     NSLog(@"TweakLog: advertisingIdentifier=%@", unidentifier);
     return unidentifier;
 }
+%end
+
+
+%hook UIPasteboard
+- (NSData *)dataForPasteboardType:(NSString *)pasteboardType
+{
+    NSData *result = %orig;
+    NSLog(@"nbTweakLog, dataForPasteboardType=%@, result=%@", pasteboardType, result);
+    return result;
+}
+%end
+
+%hook NSUserDefaults
+-(id)objectForKey:(id)aKey
+{
+    id result;
+    NSString *key = (NSString *)aKey;
+    result = %orig(aKey);
+    NSLog(@"TweakLog, NSUserDefaults objectForKey=%@, value=%@", key, result);
+    if ([key caseInsensitiveCompare:@"OpenUDID_appUID"] == NSOrderedSame)
+    {
+        //result = readParams([NSString stringWithUTF8String:STR_DEVICE_OPENUDID_APPUID]);
+        result = @"11111111111111111";
+        NSLog(@"nbTweakLog, NSUserDefaults objectForKey=%@, value=%@", key, result);
+    }
+    else if ([key caseInsensitiveCompare:@"OpenUDID"] == NSOrderedSame)
+    {
+        NSMutableDictionary *localDict = [NSMutableDictionary dictionaryWithCapacity:4];
+        //NSString *tmp = readParams([NSString stringWithUTF8String:STR_DEVICE_OPENUDID]);
+        NSString *tmp = @"222222222222222";
+        if (tmp != nil){
+            [localDict setObject:tmp forKey:@"OpenUDID"];
+            //tmp = readParams([NSString stringWithUTF8String:STR_DEVICE_OPENUDID_APPUID]);
+            tmp = @"333333333333333";
+            [localDict setObject:tmp forKey:@"OpenUDID_appUID"];
+            [localDict setObject:[NSDate date] forKey:@"OpenUDID_createdTS"];
+            //tmp = readParams([NSString stringWithUTF8String:STR_DEVICE_OPENUDID_SLOT]);
+            tmp = @"44444444444444444";
+            [localDict setObject:tmp forKey:@"OpenUDID_slot"];
+            NSLog(@"nbTweakLog, NSUserDefaults localDict objectForKey=%@, value=%@", key, localDict);
+            result = localDict;
+            NSLog(@"nbTweakLog, NSUserDefaults objectForKey=%@, value=%@", key, result);
+        }
+
+    }
+    return result;
+}
+
 %end
 
